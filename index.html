@@ -2,168 +2,283 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>CASE: THE LAB REPORT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>案件：删库跑路</title>
     <style>
         :root {
-            /* 现代都市/科技悬疑配色 */
-            --bg-paper: #f4f6f8; /* 现代办公文档背景 */
-            --ink-black: #2d3436; /* 深灰 */
-            --accent-blue: #0984e3; /* 科技蓝 */
-            --alert-orange: #d63031; /* 警示红/橙 */
-            --font-head: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            --font-body: 'Open Sans', sans-serif;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #2d8cf0; /* 科技蓝 */
+            --danger: #ed4014;
+            --text-main: #17233d;
+            --text-sub: #515a6e;
         }
-        body { background-color: #dfe6e9; color: var(--ink-black); font-family: var(--font-body); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; }
-        .container { background-color: #fff; width: 90%; max-width: 800px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-top: 5px solid var(--ink-black); position: relative; border-radius: 4px; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 手机端靠上对齐更好 */
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 600px; /* 限制最大宽度，平板/电脑也不丑 */
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
         .hidden { display: none; }
-        h1, h2, h3 { font-family: var(--font-head); font-weight: 700; border-bottom: 2px solid #eee; padding-bottom: 10px; color: var(--ink-black); letter-spacing: -0.5px; }
-        
-        .btn { background: var(--ink-black); color: white; padding: 12px 24px; border: none; cursor: pointer; font-family: var(--font-head); margin-top: 15px; font-size: 15px; border-radius: 4px; transition: all 0.2s; font-weight: 600;}
-        .btn:hover { background: var(--accent-blue); transform: translateY(-1px); }
-        .btn-skip { background: transparent; color: var(--alert-orange); border: 1px dashed var(--alert-orange); padding: 6px 12px; cursor: pointer; font-size: 12px; margin-top: 15px; border-radius: 4px; }
-        
-        .clue-box { background: #f8f9fa; padding: 20px; border-left: 4px solid var(--accent-blue); margin: 20px 0; line-height: 1.7; font-size: 0.95em; color: #444; }
-        
-        .profile-card { background: #fff; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
-        .profile-name { font-weight: bold; color: var(--accent-blue); margin-bottom: 5px; font-size: 1.05em; }
-        .profile-motive { color: #636e72; font-size: 0.9em; }
 
-        .loader-track { width: 100%; height: 8px; background: #e0e0e0; margin: 25px 0; overflow: hidden; border-radius: 4px; }
+        h1 {
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            color: var(--text-main);
+            text-align: center;
+            border-bottom: 2px solid #f8f8f9;
+            padding-bottom: 10px;
+        }
         
-        /* 进度条样式 */
-        .loader-fill { 
-            width: 0%; 
-            height: 100%; 
-            background: var(--ink-black); 
-            border-radius: 4px;
-        } 
+        h2 { font-size: 18px; margin-top: 0; }
+        p { font-size: 15px; line-height: 1.6; color: var(--text-sub); margin-bottom: 15px; }
 
-        /* 动画逻辑 (保持不变) */
+        /* 大按钮，适合手指点击 */
+        .btn {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            /* 点击反馈 */
+            active: scale(0.98); 
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+
+        .btn-skip {
+            background: transparent;
+            color: var(--danger);
+            border: 1px dashed var(--danger);
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        /* 卡片式列表 */
+        .profile-card {
+            background: #f8f8f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+        }
+        .profile-name { font-weight: bold; font-size: 15px; display: block; margin-bottom: 4px; }
+        .profile-desc { font-size: 13px; color: #808695; }
+
+        /* 进度条区域 */
+        .loader-box { margin: 30px 0; }
+        .loader-track {
+            width: 100%;
+            height: 10px;
+            background: #e8eaec;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .loader-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        /* 动画配置 (逻辑不变) */
         .mode-linear .loader-fill { transition: width 8000ms linear; }
         .mode-fast-start .loader-fill { transition: width 8000ms cubic-bezier(0.1, 0.9, 0.2, 1.0); }
         .mode-peak-end .loader-fill { transition: width 8000ms cubic-bezier(0.8, 0, 0.9, 1); }
-        
-        #math-challenge { margin-top: 15px; padding: 20px; border: 1px solid #ddd; background: #fafafa; text-align: center; border-radius: 6px; }
-        input[type="number"] { padding: 8px; width: 80px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        
-        .result-box { padding: 25px; border: 1px solid #eee; margin: 20px 0; background: #fbfbfb; border-radius: 6px; }
-        .truth-reveal { font-size: 0.9em; color: #555; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .stamp { font-size: 20px; font-weight: 800; display: inline-block; padding: 5px 12px; border: 2px solid; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; transform: rotate(-3deg); }
-        .stamp-success { color: #00b894; border-color: #00b894; }
-        .stamp-fail { color: var(--alert-orange); border-color: var(--alert-orange); }
-        
-        /* 单选框样式优化 */
-        label { display: block; margin-bottom: 10px; cursor: pointer; padding: 10px; background: #f9f9f9; border-radius: 4px; transition: background 0.2s; }
-        label:hover { background: #eef2f5; }
-        input[type="radio"] { margin-right: 10px; }
+
+        /* 验证码区域 */
+        #math-challenge {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #dcdee2;
+            border-radius: 8px;
+            text-align: center;
+        }
+        input[type="number"] {
+            padding: 10px;
+            width: 80px;
+            font-size: 18px;
+            text-align: center;
+            border: 1px solid #dcdee2;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        /* 单选框优化 */
+        label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f8f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            /* 增大点击热区 */
+            cursor: pointer; 
+        }
+        input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
+
+        /* 结果与导出 */
+        .result-box {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #bdf;
+            margin: 15px 0;
+        }
+        .stamp {
+            font-size: 18px;
+            font-weight: bold;
+            display: inline-block;
+            padding: 4px 10px;
+            border: 2px solid;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .stamp-success { color: #19be6b; border-color: #19be6b; }
+        .stamp-fail { color: #ed4014; border-color: #ed4014; }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #dcdee2;
+            border-radius: 6px;
+            font-size: 12px;
+            background: #f8f8f9;
+            box-sizing: border-box; /* 防止撑破容器 */
+        }
     </style>
 </head>
 <body>
 
 <div class="container" id="game-container">
+    
     <div id="stage-intro" class="main-stage">
-        <h1>案件：第4实验室爆炸案</h1>
-        <p>昨晚 22:15，“云端生物”研发中心的4号实验室发生爆炸，首席科学家林博士当场身亡。警方判定为易燃化学品操作失误，但你作为保险调查员，发现了疑点。</p>
+        <h1>案件：公司删库事件</h1>
+        <p>昨晚，公司核心数据库被恶意清空，备份也被覆盖。CTO 让你立刻调查三名有权限的嫌疑人。</p>
         
-        <h3>相关人员笔录摘要</h3>
         <div class="profile-card">
-            <span class="profile-name">死者：林博士 (首席科学家)</span>
-            <span class="profile-motive">状态：近期精神高度紧张，曾向董事会发送过一封加密邮件（内容未知）。</span>
+            <span class="profile-name">嫌疑人 A：新来实习生</span>
+            <span class="profile-desc">动机：操作不熟练，案发前被看到在手忙脚乱地修Bug。</span>
         </div>
         <div class="profile-card">
-            <span class="profile-name">嫌疑人 A：李助理 (博士生)</span>
-            <span class="profile-motive">动机：林博士指控他论文造假，不仅要开除他，还要他在行业内混不下去。</span>
+            <span class="profile-name">嫌疑人 B：被裁程序员</span>
+            <span class="profile-desc">动机：昨天刚收到裁员通知，扬言要“给公司留点纪念”。</span>
         </div>
         <div class="profile-card">
-            <span class="profile-name">嫌疑人 B：陈副总 (合伙人)</span>
-            <span class="profile-motive">动机：急于推进新药上市圈钱，但林博士坚持药理数据有缺陷，拒绝签字放行。</span>
-        </div>
-        <div class="profile-card">
-            <span class="profile-name">嫌疑人 C：王主管 (安全部经理)</span>
-            <span class="profile-motive">动机：负责实验室器材采购和安防。为人圆滑，声称和林博士关系融洽，没有任何利益冲突。</span>
+            <span class="profile-name">嫌疑人 C：运维主管</span>
+            <span class="profile-desc">动机：外表老实，但最近急需用钱。</span>
         </div>
 
-        <p style="margin-top: 20px; font-size: 0.9em; color: #666;">系统正在尝试恢复受损的服务器数据...</p>
-        <button class="btn" onclick="nextRound()">开始数据恢复</button>
+        <button class="btn" onclick="nextRound()">开始恢复日志</button>
     </div>
 
     <div id="stage-loading" class="main-stage hidden" onclick="handleFidget(event)">
-        <h2 id="loading-title">连接服务器...</h2>
-        <div class="loader-track"><div class="loader-fill" id="progBar"></div></div>
+        <h2 id="loading-title" style="text-align:center;">正在恢复数据...</h2>
+        <div class="loader-box">
+            <div class="loader-track"><div class="loader-fill" id="progBar"></div></div>
+        </div>
         
         <div id="skip-wrapper">
-            <button class="btn-skip" onclick="clickSkip()">>> 申请管理员权限 (Admin Override)</button>
+            <button class="btn-skip" onclick="clickSkip()">⚠ 系统卡顿？点击启用管理员通道</button>
         </div>
 
         <div id="math-challenge" class="hidden">
-            <p><strong>安全验证</strong></p>
-            <p>检测到异常流量，请输入验证码以继续：</p>
-            <span id="math-question" style="font-size: 1.2em; letter-spacing: 2px; font-family: monospace; font-weight: bold;"></span> = 
-            <input type="number" id="math-answer">
-            <button class="btn" style="padding:8px 20px; margin-left: 10px; margin-top:0;" onclick="checkMath()">验证</button>
+            <p><strong>管理员身份验证</strong></p>
+            <div style="margin: 15px 0;">
+                <span id="math-question" style="font-size: 20px; font-weight: bold; letter-spacing: 2px;"></span> = ?
+            </div>
+            <input type="number" id="math-answer" placeholder="结果">
+            <button class="btn" style="margin-top:15px;" onclick="checkMath()">确认验证</button>
         </div>
     </div>
 
     <div id="stage-clue" class="main-stage hidden">
-        <h2 id="clue-meta"></h2>
-        <div class="clue-box" id="clue-text"></div>
-        <button class="btn" onclick="nextRound()">分析下一条数据</button>
+        <h2>恢复成功</h2>
+        <p style="color:#2d8cf0; font-weight:bold;" id="clue-meta"></p>
+        <div style="background:#fff; border:1px solid #eee; padding:15px; border-radius:8px;">
+            <p id="clue-text" style="margin:0; color:#333;"></p>
+        </div>
+        <button class="btn" onclick="nextRound()">继续</button>
     </div>
 
     <div id="stage-deduction" class="main-stage hidden">
-        <h2>最终调查报告</h2>
-        <p>综合恢复的三份数据日志，谁最有可能是制造这场“意外”的真凶？</p>
-        <label><input type="radio" name="suspect" value="李助理"> 李助理 (为前途杀人)</label>
-        <label><input type="radio" name="suspect" value="陈副总"> 陈副总 (为利益杀人)</label>
-        <label><input type="radio" name="suspect" value="王主管"> 王主管 (安全主管)</label>
-        <button class="btn" onclick="submitVerdict()">提交结案报告</button>
+        <h1>结案报告</h1>
+        <p>根据恢复的日志，谁是真凶？</p>
+        <label><input type="radio" name="suspect" value="实习生"> 实习生 (误操作)</label>
+        <label><input type="radio" name="suspect" value="被裁员工"> 被裁程序员 (报复)</label>
+        <label><input type="radio" name="suspect" value="运维主管"> 运维主管 (倒卖数据)</label>
+        <button class="btn" onclick="submitVerdict()">提交报告</button>
     </div>
 
     <div id="stage-result" class="main-stage hidden">
-        <div id="result-header"></div>
+        <div id="result-header" style="text-align: center;"></div>
         <div class="result-box">
-            <p id="result-message"></p>
-            <div class="truth-reveal">
-                <h3>案情复盘</h3>
-                <p><strong>真凶：王主管 (安全经理)</strong></p>
-                <p>1. <strong>核心矛盾</strong>：虽然李助理和陈副总都有杀人动机，但他们没有作案能力。爆炸源于“通风系统关闭”导致的化学气体积聚。只有安全主管有权限在不触发警报的情况下，远程关闭特定实验室的通风阀。</p>
-                <p>2. <strong>关键线索</strong>：恢复的采购单（日志I）显示，王主管长期采购廉价劣质的过滤阀，并通过虚报价格贪污差价。林博士生前发送的加密邮件（日志III）正是关于设备故障的投诉。王主管为了掩盖贪污证据，企图制造一场小火灾销毁设备，却导致了爆炸。</p>
-                <p>3. <strong>不在场证明的漏洞</strong>：门禁记录（日志II）显示案发时无人进出，这是王主管最得意的布局——他利用远程权限作案，根本不需要出现在现场。</p>
+            <p id="result-message" style="font-weight:bold; margin-bottom:10px;"></p>
+            <div style="font-size:13px; color:#666; border-top:1px solid #ccc; padding-top:10px;">
+                <strong>真相还原：</strong><br>
+                真凶是<b>运维主管</b>。<br><br>
+                1. 实习生虽然菜，但他没有核心权限删除备份。<br>
+                2. 被裁员工的账号在离职即刻就被冻结了，无法登录。<br>
+                3. 日志显示，操作是用<b>主管的物理密钥</b>进行的，且数据在删除前被打包上传到了海外网盘（为了卖钱）。
             </div>
         </div>
         <button class="btn" onclick="goToExport()">生成实验数据</button>
     </div>
 
     <div id="stage-export" class="main-stage hidden">
-        <h2>数据已归档</h2>
-        <p>请复制下方代码，粘贴到问卷的<strong>第一题</strong>中：</p>
-        <textarea id="final-data" style="width:100%; height:200px; font-family:monospace; padding:10px; font-size: 12px; background:#f4f6f8; border:1px solid #ddd;" readonly></textarea>
-        <br><br>
-        <button class="btn" id="copy-btn" onclick="copyData()">复制数据</button>
+        <h2>实验结束</h2>
+        <p>请复制下方代码：</p>
+        <textarea id="final-data" readonly></textarea>
+        <button class="btn" id="copy-btn" onclick="copyData()">一键复制</button>
     </div>
 </div>
 
 <script>
-    // --- 游戏文案配置 (现代悬疑版) ---
+    // --- 极简文案配置 ---
     const clues = [
-        { meta: "数据碎片 I：后台采购单", text: "已恢复一份被删除的 Excel。数据显示，过去一年实验室的‘空气过滤阀’采购价格，比市场价高出 300%，但供应商却是一家注册在海外的空壳公司。该采购流程的最终审批人签字是：王主管。" },
-        { meta: "数据碎片 II：门禁日志", text: "案发当晚 21:00 至 23:00，4号实验室没有人员进出记录。但是，系统日志显示，22:10（爆炸前5分钟），实验室的智能通风系统接收到了一条‘强制休眠’指令。该指令发出的 IP 地址来自公司内部的安防监控室。" },
-        { meta: "数据碎片 III：死者草稿箱", text: "林博士的邮箱草稿箱里有一封未发出的邮件，收件人是审计署。标题是《关于安防设备严重老化及经费去向不明的举报材料》。附件是一份详细的设备检测报告，证明目前的安防设备根本无法通过验收。" }
+        { meta: "日志片段 1/3", text: "系统显示：‘核心数据库’是被永久删除的，而不是格式化。这种操作需要最高级别的物理密钥（U盾）插入服务器才能执行。" },
+        { meta: "日志片段 2/3", text: "账号记录显示：被裁程序员的账号在昨天下午 17:00 就已经被HR冻结了，案发时他根本无法登录系统。" },
+        { meta: "日志片段 3/3", text: "流量分析：在数据被删除的前10分钟，服务器有大量数据流出，目的地是一个境外的匿名网盘。这不是报复泄愤，这是为了偷数据卖钱。" }
     ];
     
-    // 加载界面的文案
     const loadingTexts = [
-        "正在恢复：财务部隐秘账目 (1/3)...",
-        "正在解析：安防系统操作日志 (2/3)...",
-        "正在解密：死者云端草稿箱 (3/3)..."
+        "正在扫描操作日志...",
+        "正在核对账号权限...",
+        "正在追踪网络流量..."
     ];
     
-    // 数学题 (保持简单)
-    const mathQs = [ {q: "15 + 25", a: 40}, {q: "50 - 15", a: 35}, {q: "8 x 6", a: 48} ];
+    // 简单的数学题
+    const mathQs = [ {q: "10 + 20", a: 30}, {q: "5 x 6", a: 30}, {q: "50 - 5", a: 45} ];
 
     let currentRound = 0;
     
-    // --- 核心逻辑 (保持不变) ---
+    // --- 核心逻辑 ---
     const urlParams = new URLSearchParams(window.location.search);
     const assignedGroup = urlParams.get('g') ? parseInt(urlParams.get('g')) : Math.floor(Math.random() * 3) + 1;
 
@@ -187,7 +302,6 @@
 
     function startWaiting() {
         if (waitTimeout) clearTimeout(waitTimeout);
-        
         switchStage('stage-loading');
         
         if (currentRound < loadingTexts.length) {
@@ -197,20 +311,20 @@
         const bar = document.getElementById('progBar');
         const container = document.getElementById('stage-loading');
         
+        // UI重置
         document.getElementById('math-challenge').classList.add('hidden');
         document.getElementById('skip-wrapper').classList.remove('hidden');
         document.getElementById('math-answer').value = "";
 
-        // 重置动画状态
+        // 动画重置
         container.classList.remove('mode-linear', 'mode-fast-start', 'mode-peak-end');
         bar.style.transition = 'none'; 
         bar.style.width = "0%";
         
-        // 强制重绘
-        void bar.offsetWidth; 
+        void bar.offsetWidth; // 强制重绘
         bar.style.transition = ''; 
 
-        // 延迟触发
+        // 延迟启动
         setTimeout(() => {
             if (experimentData.group === 1) container.classList.add('mode-linear');
             else if (experimentData.group === 2) container.classList.add('mode-fast-start');
@@ -238,7 +352,6 @@
         if (currentClickSkipTime === null) {
             currentClickSkipTime = Date.now() - waitStartTime;
         }
-
         document.getElementById('math-question').innerText = mathQs[currentRound].q;
         document.getElementById('skip-wrapper').classList.add('hidden');
         document.getElementById('math-challenge').classList.remove('hidden');
@@ -279,18 +392,18 @@
 
     function submitVerdict() {
         const sel = document.querySelector('input[name="suspect"]:checked');
-        if (!sel) return alert("请选择一名嫌疑人");
+        if (!sel) return alert("请选择一个嫌疑人");
         experimentData.finalChoice = sel.value;
-        experimentData.isCorrect = (sel.value === "王主管");
+        experimentData.isCorrect = (sel.value === "运维主管");
         
         const header = document.getElementById('result-header');
         const msg = document.getElementById('result-message');
         if (experimentData.isCorrect) {
-            header.innerHTML = '<div class="stamp stamp-success">判定准确</div>';
-            msg.innerText = "非常敏锐。你没有被显眼的情感矛盾误导，而是抓住了背后隐藏的利益链条。";
+            header.innerHTML = '<div class="stamp stamp-success">判断正确</div>';
+            msg.innerText = "厉害！你成功锁定了内鬼。";
         } else {
-            header.innerHTML = '<div class="stamp stamp-fail">判定错误</div>';
-            msg.innerText = "很遗憾。真正的凶手是王主管。你可能过度关注了显性的杀人动机，而忽略了隐性的职务犯罪线索。";
+            header.innerHTML = '<div class="stamp stamp-fail">判断错误</div>';
+            msg.innerText = "很遗憾，真凶是运维主管。";
         }
         switchStage('stage-result');
     }
