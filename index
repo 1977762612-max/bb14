@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MISSION: DEEP SPACE SILENCE</title>
+    <style>
+        :root {
+            /* 修改配色以匹配科幻/深空风格 */
+            --bg-paper: #e0e5eb; /* 冷灰 */
+            --ink-black: #0b1d2e; /*以此深蓝代替黑色 */
+            --stamp-red: #c92a2a;
+            --success-green: #087f5b;
+            --font-head: 'Courier New', Courier, monospace;
+        }
+        body { background-color: #0f1217; color: var(--ink-black); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; }
+        .container { background-color: var(--bg-paper); width: 90%; max-width: 800px; padding: 40px; box-shadow: 0 0 50px rgba(0,255,255,0.1); border: 2px solid #2c3e50; position: relative; }
+        .hidden { display: none; }
+        h1, h2, h3 { font-family: var(--font-head); text-transform: uppercase; border-bottom: 2px solid var(--ink-black); padding-bottom: 10px; color: #1a2a3a; }
+        .btn { background: var(--ink-black); color: white; padding: 10px 20px; border: none; cursor: pointer; font-family: var(--font-head); margin-top: 10px; font-size: 16px; transition: background 0.3s;}
+        .btn:hover { background: #2c5282; }
+        .btn-skip { background: transparent; color: var(--stamp-red); border: 1px dashed var(--stamp-red); padding: 5px 10px; cursor: pointer; font-size: 12px; margin-top: 10px; }
+        .clue-box { background: rgba(255,255,255,0.8); padding: 20px; border-left: 5px solid var(--ink-black); margin: 20px 0; line-height: 1.6; font-family: monospace; border: 1px solid #ccc; }
+        
+        .profile-card { background: #dbe4ef; padding: 15px; margin-bottom: 10px; border-left: 4px solid #4a90e2; font-size: 0.95em; }
+        .profile-name { font-weight: bold; color: #1a365d; display: block; margin-bottom: 4px; font-family: var(--font-head); }
+        .profile-motive { font-style: normal; color: #4a5568; display: block; font-size: 0.9em; }
+
+        .loader-track { width: 100%; height: 20px; background: #cddceb; border: 2px solid var(--ink-black); margin: 20px 0; overflow: hidden; }
+        
+        /* 进度条基础样式 */
+        .loader-fill { 
+            width: 0%; 
+            height: 100%; 
+            background: #2b6cb0; /* 科幻蓝 */
+        } 
+
+        /* 三种动画曲线模式 (代码逻辑保持不变) */
+        /* Group 1: 线性匀速 */
+        .mode-linear .loader-fill { transition: width 8000ms linear; }
+        /* Group 2: 快速开始 */
+        .mode-fast-start .loader-fill { transition: width 8000ms cubic-bezier(0.1, 0.9, 0.2, 1.0); }
+        /* Group 3: 峰值结尾 */
+        .mode-peak-end .loader-fill { transition: width 8000ms cubic-bezier(0.8, 0, 0.9, 1); }
+        
+        #math-challenge { margin-top: 15px; padding: 15px; border: 1px solid #aaa; background: #fff; text-align: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+        input[type="number"] { padding: 5px; width: 60px; font-size: 16px; border: 1px solid var(--ink-black); background: #f0f4f8; }
+        
+        .result-box { padding: 20px; border: 2px solid var(--ink-black); margin: 20px 0; background: rgba(255,255,255,0.4); }
+        .truth-reveal { font-size: 0.9em; color: #333; margin-top: 15px; border-top: 1px dashed #999; padding-top: 10px; }
+        .stamp { font-size: 24px; font-weight: bold; transform: rotate(-5deg); display: inline-block; padding: 5px 15px; border: 3px solid; margin-bottom: 15px; letter-spacing: 2px; }
+        .stamp-success { color: var(--success-green); border-color: var(--success-green); }
+        .stamp-fail { color: var(--stamp-red); border-color: var(--stamp-red); }
+    </style>
+</head>
+<body>
+
+<div class="container" id="game-container">
+    <div id="stage-intro" class="main-stage">
+        <h1>任务代号：深空静默</h1>
+        <p>星际货运船“深空号”在抵达火星前夕发生氧气系统爆炸。船长当场身亡。你需要恢复受损的飞船日志，找出破坏者。</p>
+        
+        <h3>嫌疑船员名单</h3>
+        <div class="profile-card">
+            <span class="profile-name">死者：船长 (严厉独裁者)</span>
+            <span class="profile-motive">状态：在主控室被发现，死因为氧气面罩被恶意切断。</span>
+        </div>
+        <div class="profile-card">
+            <span class="profile-name">嫌疑人 A：大副 (领航员)</span>
+            <span class="profile-motive">动机：上周因航线制定失误被船长撤职，面临巨额罚款和降级。</span>
+        </div>
+        <div class="profile-card">
+            <span class="profile-name">嫌疑人 B：机械师 (新兵)</span>
+            <span class="profile-motive">动机：长期抱怨船长强迫他加班且不发加班费，曾扬言“要拆了这破船”。</span>
+        </div>
+        <div class="profile-card">
+            <span class="profile-name">嫌疑人 C：随船医生 (生物学家)</span>
+            <span class="profile-motive">动机：温文尔雅，但最近频繁与船长争吵。船员传言他发现船长在走私违禁生物样本。</span>
+        </div>
+
+        <p style="margin-top: 20px; font-style: italic; color: #555;">等待连接主机数据库...</p>
+        <button class="btn" onclick="nextRound()">连接飞船主机</button>
+    </div>
+
+    <div id="stage-loading" class="main-stage hidden" onclick="handleFidget(event)">
+        <h2 id="loading-title">正在建立连接...</h2>
+        <div class="loader-track"><div class="loader-fill" id="progBar"></div></div>
+        
+        <div id="skip-wrapper">
+            <button class="btn-skip" onclick="clickSkip()">>> 启动应急超频 (Override)</button>
+        </div>
+
+        <div id="math-challenge" class="hidden">
+            <p><strong>警告：安全协议拦截</strong></p>
+            <p>请输入管理员密钥以强制执行：</p>
+            <span id="math-question" style="font-size: 1.2em; letter-spacing: 2px; font-family: monospace;"></span> = 
+            <input type="number" id="math-answer">
+            <button class="btn" style="padding:5px 15px; margin-left: 10px;" onclick="checkMath()">验证</button>
+        </div>
+    </div>
+
+    <div id="stage-clue" class="main-stage hidden">
+        <h2 id="clue-meta"></h2>
+        <div class="clue-box" id="clue-text"></div>
+        <button class="btn" onclick="nextRound()">继续检索</button>
+    </div>
+
+    <div id="stage-deduction" class="main-stage hidden">
+        <h2>最终报告</h2>
+        <p>根据恢复的数据日志，谁是导致系统崩溃的真凶？</p>
+        <label><input type="radio" name="suspect" value="大副"> 大副 (动机：被撤职复仇)</label><br><br>
+        <label><input type="radio" name="suspect" value="机械师"> 机械师 (动机：劳资纠纷)</label><br><br>
+        <label><input type="radio" name="suspect" value="医生"> 随船医生 (动机：发现走私)</label><br><br>
+        <button class="btn" onclick="submitVerdict()">提交审查结果</button>
+    </div>
+
+    <div id="stage-result" class="main-stage hidden">
+        <div id="result-header"></div>
+        <div class="result-box">
+            <p id="result-message"></p>
+            <div class="truth-reveal">
+                <h3>案件还原</h3>
+                <p><strong>真凶：随船医生</strong></p>
+                <p>1. <strong>日志分析</strong>：氧气循环系统的阀门被注入了一种“神经毒素”导致传感器失效。这种毒素只有医疗室的最高权限保险柜里才有，机械师和大副都无法接触。</p>
+                <p>2. <strong>物理痕迹</strong>：主控室门禁日志被删除了。但备用电源记录显示，在爆炸前5分钟，有人使用了“生物识别”开门。当时大副正在驾驶舱值班，机械师在底层修引擎，只有医生没有不在场证明。</p>
+                <p>3. <strong>核心动机</strong>：船长走私的外星样本具有极高传染性，医生为了阻止飞船降落地球造成瘟疫，决定牺牲船长并伪造事故迫降。</p>
+            </div>
+        </div>
+        <button class="btn" onclick="goToExport()">生成实验数据</button>
+    </div>
+
+    <div id="stage-export" class="main-stage hidden">
+        <h2>数据已存档</h2>
+        <p>请复制下方加密字串，粘贴到问卷的<strong>第一题</strong>中：</p>
+        <textarea id="final-data" style="width:100%; height:250px; font-family:monospace; padding:10px; font-size: 12px; background:#f0f4f8;" readonly></textarea>
+        <br><br>
+        <button class="btn" id="copy-btn" onclick="copyData()">复制数据</button>
+    </div>
+</div>
+
+<script>
+    // --- 游戏文案配置 (Update) ---
+    const clues = [
+        { meta: "日志 I：物质分析", text: "系统恢复显示：氧气过滤阀并非自然损坏，而是被高浓度的‘化合物-X’腐蚀。这是一种受管制的医疗级化学试剂，通常只用于尸体防腐。普通船员根本接触不到这种物质。" },
+        { meta: "日志 II：门禁记录", text: "恢复的数据碎片显示，案发当晚主控室的门禁系统被‘高级权限’解锁。大副的权限在上周已被吊销；机械师只有引擎室权限。唯一保留有主控室备用医疗通行权的，只有医生。" },
+        { meta: "日志 III：黑匣子录音", text: "一段受损的录音被修复。背景音中听到了船长的怒吼：‘你疯了吗？这批货能卖几亿！’ 紧接着是一个冷静的声音：‘为了人类安全，必须切断你的贪婪。’ 声音波形分析与大副粗犷的声线不符，更接近医生平时冷静的语调。" }
+    ];
+    
+    // 加载界面的文案
+    const loadingTexts = [
+        "正在扫描：环境控制系统残留物 (日志 I)...",
+        "正在解密：主控室门禁防火墙 (日志 II)...",
+        "正在修复：舰桥黑匣子音频数据 (日志 III)..."
+    ];
+    
+    // 数学题保持简单
+    const mathQs = [ {q: "40 + 5", a: 45}, {q: "100 - 10", a: 90}, {q: "6 x 7", a: 42} ];
+
+    let currentRound = 0;
+    
+    // --- 核心逻辑 (保持不变) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const assignedGroup = urlParams.get('g') ? parseInt(urlParams.get('g')) : Math.floor(Math.random() * 3) + 1;
+
+    let experimentData = {
+        group: assignedGroup, 
+        rounds: [], 
+        finalChoice: "",
+        isCorrect: false,
+        startTime: Date.now()
+    };
+
+    let waitStartTime, waitTimeout, currentVerifErrors = 0, currentFidgetClicks = 0, currentClickSkipTime = null;
+
+    function nextRound() {
+        if (currentRound < clues.length) {
+            startWaiting();
+        } else {
+            switchStage('stage-deduction');
+        }
+    }
+
+    function startWaiting() {
+        if (waitTimeout) clearTimeout(waitTimeout);
+        
+        switchStage('stage-loading');
+        
+        if (currentRound < loadingTexts.length) {
+            document.getElementById('loading-title').innerText = loadingTexts[currentRound];
+        }
+
+        const bar = document.getElementById('progBar');
+        const container = document.getElementById('stage-loading');
+        
+        document.getElementById('math-challenge').classList.add('hidden');
+        document.getElementById('skip-wrapper').classList.remove('hidden');
+        document.getElementById('math-answer').value = "";
+
+        // 重置动画
+        container.classList.remove('mode-linear', 'mode-fast-start', 'mode-peak-end');
+        bar.style.transition = 'none'; 
+        bar.style.width = "0%";
+        
+        setTimeout(() => {
+            // 根据分组添加动画类
+            if (experimentData.group === 1) container.classList.add('mode-linear');
+            else if (experimentData.group === 2) container.classList.add('mode-fast-start');
+            else if (experimentData.group === 3) container.classList.add('mode-peak-end');
+
+            bar.style.transition = ''; 
+            bar.style.width = "100%";
+        }, 50);
+
+        waitStartTime = Date.now();
+        currentVerifErrors = 0;
+        currentFidgetClicks = 0;
+        currentClickSkipTime = null;
+
+        waitTimeout = setTimeout(() => {
+            finishWaiting(false);
+        }, 8000);
+    }
+
+    function handleFidget(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+        currentFidgetClicks++;
+    }
+
+    function clickSkip() {
+        if (currentClickSkipTime === null) {
+            currentClickSkipTime = Date.now() - waitStartTime;
+        }
+
+        document.getElementById('math-question').innerText = mathQs[currentRound].q;
+        document.getElementById('skip-wrapper').classList.add('hidden');
+        document.getElementById('math-challenge').classList.remove('hidden');
+    }
+
+    function checkMath() {
+        const val = parseInt(document.getElementById('math-answer').value);
+        if (val === mathQs[currentRound].a) {
+            clearTimeout(waitTimeout); 
+            const bar = document.getElementById('progBar');
+            bar.style.transition = 'width 200ms ease-out';
+            bar.style.width = "100%";
+            setTimeout(() => { finishWaiting(true); }, 200); 
+        } else {
+            currentVerifErrors++;
+            alert("密钥错误，拒绝访问");
+            document.getElementById('math-answer').value = "";
+        }
+    }
+
+    function finishWaiting(skipped) {
+        if (waitTimeout) clearTimeout(waitTimeout);
+        
+        experimentData.rounds.push({
+            round: currentRound + 1,
+            skipped: skipped,
+            verifErrors: currentVerifErrors,
+            waitTime_ms: Date.now() - waitStartTime, 
+            fidgetClicks: currentFidgetClicks,
+            timeToClickSkip_ms: currentClickSkipTime 
+        });
+        
+        document.getElementById('clue-meta').innerText = clues[currentRound].meta;
+        document.getElementById('clue-text').innerText = clues[currentRound].text;
+        switchStage('stage-clue');
+        currentRound++;
+    }
+
+    function submitVerdict() {
+        const sel = document.querySelector('input[name="suspect"]:checked');
+        if (!sel) return alert("请选择审查结果");
+        experimentData.finalChoice = sel.value;
+        // 修改正确答案判定逻辑
+        experimentData.isCorrect = (sel.value === "医生");
+        
+        const header = document.getElementById('result-header');
+        const msg = document.getElementById('result-message');
+        if (experimentData.isCorrect) {
+            header.innerHTML = '<div class="stamp stamp-success">审查通过</div>';
+            msg.innerText = "出色的逻辑分析。你成功识破了伪装成意外的蓄意谋杀。";
+        } else {
+            header.innerHTML = '<div class="stamp stamp-fail">审查驳回</div>';
+            msg.innerText = "判断错误。你忽略了关键的权限与物质证据，真凶依然逍遥法外。";
+        }
+        switchStage('stage-result');
+    }
+
+    function goToExport() {
+        document.getElementById('final-data').value = JSON.stringify(experimentData, null, 2);
+        switchStage('stage-export');
+    }
+
+    function switchStage(id) {
+        document.querySelectorAll('.main-stage').forEach(el => el.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function copyData() {
+        const txt = document.getElementById('final-data');
+        txt.select(); document.execCommand('copy');
+        document.getElementById('copy-btn').innerText = "✅ 数据已复制";
+    }
+</script>
+</body>
+</html>
