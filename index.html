@@ -70,4 +70,246 @@
             <span class="profile-name">死者：林博士 (首席科学家)</span>
             <span class="profile-motive">状态：近期精神高度紧张，曾向董事会发送过一封加密邮件（内容未知）。</span>
         </div>
-        <div class="profile
+        <div class="profile-card">
+            <span class="profile-name">嫌疑人 A：李助理 (博士生)</span>
+            <span class="profile-motive">动机：林博士指控他论文造假，不仅要开除他，还要他在行业内混不下去。</span>
+        </div>
+        <div class="profile-card">
+            <span class="profile-name">嫌疑人 B：陈副总 (合伙人)</span>
+            <span class="profile-motive">动机：急于推进新药上市圈钱，但林博士坚持药理数据有缺陷，拒绝签字放行。</span>
+        </div>
+        <div class="profile-card">
+            <span class="profile-name">嫌疑人 C：王主管 (安全部经理)</span>
+            <span class="profile-motive">动机：负责实验室器材采购和安防。为人圆滑，声称和林博士关系融洽，没有任何利益冲突。</span>
+        </div>
+
+        <p style="margin-top: 20px; font-size: 0.9em; color: #666;">系统正在尝试恢复受损的服务器数据...</p>
+        <button class="btn" onclick="nextRound()">开始数据恢复</button>
+    </div>
+
+    <div id="stage-loading" class="main-stage hidden" onclick="handleFidget(event)">
+        <h2 id="loading-title">连接服务器...</h2>
+        <div class="loader-track"><div class="loader-fill" id="progBar"></div></div>
+        
+        <div id="skip-wrapper">
+            <button class="btn-skip" onclick="clickSkip()">>> 申请管理员权限 (Admin Override)</button>
+        </div>
+
+        <div id="math-challenge" class="hidden">
+            <p><strong>安全验证</strong></p>
+            <p>检测到异常流量，请输入验证码以继续：</p>
+            <span id="math-question" style="font-size: 1.2em; letter-spacing: 2px; font-family: monospace; font-weight: bold;"></span> = 
+            <input type="number" id="math-answer">
+            <button class="btn" style="padding:8px 20px; margin-left: 10px; margin-top:0;" onclick="checkMath()">验证</button>
+        </div>
+    </div>
+
+    <div id="stage-clue" class="main-stage hidden">
+        <h2 id="clue-meta"></h2>
+        <div class="clue-box" id="clue-text"></div>
+        <button class="btn" onclick="nextRound()">分析下一条数据</button>
+    </div>
+
+    <div id="stage-deduction" class="main-stage hidden">
+        <h2>最终调查报告</h2>
+        <p>综合恢复的三份数据日志，谁最有可能是制造这场“意外”的真凶？</p>
+        <label><input type="radio" name="suspect" value="李助理"> 李助理 (为前途杀人)</label>
+        <label><input type="radio" name="suspect" value="陈副总"> 陈副总 (为利益杀人)</label>
+        <label><input type="radio" name="suspect" value="王主管"> 王主管 (安全主管)</label>
+        <button class="btn" onclick="submitVerdict()">提交结案报告</button>
+    </div>
+
+    <div id="stage-result" class="main-stage hidden">
+        <div id="result-header"></div>
+        <div class="result-box">
+            <p id="result-message"></p>
+            <div class="truth-reveal">
+                <h3>案情复盘</h3>
+                <p><strong>真凶：王主管 (安全经理)</strong></p>
+                <p>1. <strong>核心矛盾</strong>：虽然李助理和陈副总都有杀人动机，但他们没有作案能力。爆炸源于“通风系统关闭”导致的化学气体积聚。只有安全主管有权限在不触发警报的情况下，远程关闭特定实验室的通风阀。</p>
+                <p>2. <strong>关键线索</strong>：恢复的采购单（日志I）显示，王主管长期采购廉价劣质的过滤阀，并通过虚报价格贪污差价。林博士生前发送的加密邮件（日志III）正是关于设备故障的投诉。王主管为了掩盖贪污证据，企图制造一场小火灾销毁设备，却导致了爆炸。</p>
+                <p>3. <strong>不在场证明的漏洞</strong>：门禁记录（日志II）显示案发时无人进出，这是王主管最得意的布局——他利用远程权限作案，根本不需要出现在现场。</p>
+            </div>
+        </div>
+        <button class="btn" onclick="goToExport()">生成实验数据</button>
+    </div>
+
+    <div id="stage-export" class="main-stage hidden">
+        <h2>数据已归档</h2>
+        <p>请复制下方代码，粘贴到问卷的<strong>第一题</strong>中：</p>
+        <textarea id="final-data" style="width:100%; height:200px; font-family:monospace; padding:10px; font-size: 12px; background:#f4f6f8; border:1px solid #ddd;" readonly></textarea>
+        <br><br>
+        <button class="btn" id="copy-btn" onclick="copyData()">复制数据</button>
+    </div>
+</div>
+
+<script>
+    // --- 游戏文案配置 (现代悬疑版) ---
+    const clues = [
+        { meta: "数据碎片 I：后台采购单", text: "已恢复一份被删除的 Excel。数据显示，过去一年实验室的‘空气过滤阀’采购价格，比市场价高出 300%，但供应商却是一家注册在海外的空壳公司。该采购流程的最终审批人签字是：王主管。" },
+        { meta: "数据碎片 II：门禁日志", text: "案发当晚 21:00 至 23:00，4号实验室没有人员进出记录。但是，系统日志显示，22:10（爆炸前5分钟），实验室的智能通风系统接收到了一条‘强制休眠’指令。该指令发出的 IP 地址来自公司内部的安防监控室。" },
+        { meta: "数据碎片 III：死者草稿箱", text: "林博士的邮箱草稿箱里有一封未发出的邮件，收件人是审计署。标题是《关于安防设备严重老化及经费去向不明的举报材料》。附件是一份详细的设备检测报告，证明目前的安防设备根本无法通过验收。" }
+    ];
+    
+    // 加载界面的文案
+    const loadingTexts = [
+        "正在恢复：财务部隐秘账目 (1/3)...",
+        "正在解析：安防系统操作日志 (2/3)...",
+        "正在解密：死者云端草稿箱 (3/3)..."
+    ];
+    
+    // 数学题 (保持简单)
+    const mathQs = [ {q: "15 + 25", a: 40}, {q: "50 - 15", a: 35}, {q: "8 x 6", a: 48} ];
+
+    let currentRound = 0;
+    
+    // --- 核心逻辑 (保持不变) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const assignedGroup = urlParams.get('g') ? parseInt(urlParams.get('g')) : Math.floor(Math.random() * 3) + 1;
+
+    let experimentData = {
+        group: assignedGroup, 
+        rounds: [], 
+        finalChoice: "",
+        isCorrect: false,
+        startTime: Date.now()
+    };
+
+    let waitStartTime, waitTimeout, currentVerifErrors = 0, currentFidgetClicks = 0, currentClickSkipTime = null;
+
+    function nextRound() {
+        if (currentRound < clues.length) {
+            startWaiting();
+        } else {
+            switchStage('stage-deduction');
+        }
+    }
+
+    function startWaiting() {
+        if (waitTimeout) clearTimeout(waitTimeout);
+        
+        switchStage('stage-loading');
+        
+        if (currentRound < loadingTexts.length) {
+            document.getElementById('loading-title').innerText = loadingTexts[currentRound];
+        }
+
+        const bar = document.getElementById('progBar');
+        const container = document.getElementById('stage-loading');
+        
+        document.getElementById('math-challenge').classList.add('hidden');
+        document.getElementById('skip-wrapper').classList.remove('hidden');
+        document.getElementById('math-answer').value = "";
+
+        // 重置动画状态
+        container.classList.remove('mode-linear', 'mode-fast-start', 'mode-peak-end');
+        bar.style.transition = 'none'; 
+        bar.style.width = "0%";
+        
+        // 强制重绘
+        void bar.offsetWidth; 
+        bar.style.transition = ''; 
+
+        // 延迟触发
+        setTimeout(() => {
+            if (experimentData.group === 1) container.classList.add('mode-linear');
+            else if (experimentData.group === 2) container.classList.add('mode-fast-start');
+            else if (experimentData.group === 3) container.classList.add('mode-peak-end');
+            
+            bar.style.width = "100%";
+        }, 50);
+
+        waitStartTime = Date.now();
+        currentVerifErrors = 0;
+        currentFidgetClicks = 0;
+        currentClickSkipTime = null;
+
+        waitTimeout = setTimeout(() => {
+            finishWaiting(false);
+        }, 8000);
+    }
+
+    function handleFidget(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+        currentFidgetClicks++;
+    }
+
+    function clickSkip() {
+        if (currentClickSkipTime === null) {
+            currentClickSkipTime = Date.now() - waitStartTime;
+        }
+
+        document.getElementById('math-question').innerText = mathQs[currentRound].q;
+        document.getElementById('skip-wrapper').classList.add('hidden');
+        document.getElementById('math-challenge').classList.remove('hidden');
+    }
+
+    function checkMath() {
+        const val = parseInt(document.getElementById('math-answer').value);
+        if (val === mathQs[currentRound].a) {
+            clearTimeout(waitTimeout); 
+            const bar = document.getElementById('progBar');
+            bar.style.transition = 'width 200ms ease-out';
+            bar.style.width = "100%";
+            setTimeout(() => { finishWaiting(true); }, 200); 
+        } else {
+            currentVerifErrors++;
+            alert("验证码错误");
+            document.getElementById('math-answer').value = "";
+        }
+    }
+
+    function finishWaiting(skipped) {
+        if (waitTimeout) clearTimeout(waitTimeout);
+        
+        experimentData.rounds.push({
+            round: currentRound + 1,
+            skipped: skipped,
+            verifErrors: currentVerifErrors,
+            waitTime_ms: Date.now() - waitStartTime, 
+            fidgetClicks: currentFidgetClicks,
+            timeToClickSkip_ms: currentClickSkipTime 
+        });
+        
+        document.getElementById('clue-meta').innerText = clues[currentRound].meta;
+        document.getElementById('clue-text').innerText = clues[currentRound].text;
+        switchStage('stage-clue');
+        currentRound++;
+    }
+
+    function submitVerdict() {
+        const sel = document.querySelector('input[name="suspect"]:checked');
+        if (!sel) return alert("请选择一名嫌疑人");
+        experimentData.finalChoice = sel.value;
+        experimentData.isCorrect = (sel.value === "王主管");
+        
+        const header = document.getElementById('result-header');
+        const msg = document.getElementById('result-message');
+        if (experimentData.isCorrect) {
+            header.innerHTML = '<div class="stamp stamp-success">判定准确</div>';
+            msg.innerText = "非常敏锐。你没有被显眼的情感矛盾误导，而是抓住了背后隐藏的利益链条。";
+        } else {
+            header.innerHTML = '<div class="stamp stamp-fail">判定错误</div>';
+            msg.innerText = "很遗憾。真正的凶手是王主管。你可能过度关注了显性的杀人动机，而忽略了隐性的职务犯罪线索。";
+        }
+        switchStage('stage-result');
+    }
+
+    function goToExport() {
+        document.getElementById('final-data').value = JSON.stringify(experimentData, null, 2);
+        switchStage('stage-export');
+    }
+
+    function switchStage(id) {
+        document.querySelectorAll('.main-stage').forEach(el => el.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function copyData() {
+        const txt = document.getElementById('final-data');
+        txt.select(); document.execCommand('copy');
+        document.getElementById('copy-btn').innerText = "✅ 已复制";
+    }
+</script>
+</body>
+</html>
