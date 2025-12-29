@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>案件：删库跑路</title>
+    <title>案件：幽灵代码</title>
     <style>
         :root {
-            --bg-color: #f0f2f5;
+            --bg-color: #f7f9fc;
             --card-bg: #ffffff;
-            --primary: #2d8cf0; /* 科技蓝 */
-            --danger: #ed4014;
-            --text-main: #17233d;
-            --text-sub: #515a6e;
+            --primary: #4776E6; /* 渐变蓝主色 */
+            --danger: #FF512F;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
         }
         
         body {
@@ -23,154 +23,158 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* 手机端靠上对齐更好 */
+            align-items: flex-start;
         }
 
         .container {
             background-color: var(--card-bg);
             width: 100%;
-            max-width: 600px; /* 限制最大宽度，平板/电脑也不丑 */
+            max-width: 600px;
             padding: 25px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 16px; /* 更圆润的角 */
+            box-shadow: 0 10px 30px rgba(71, 118, 230, 0.1);
             box-sizing: border-box;
         }
 
         .hidden { display: none; }
 
         h1 {
-            font-size: 20px;
-            margin: 0 0 15px 0;
-            color: var(--text-main);
+            font-size: 22px;
+            margin: 0 0 20px 0;
+            color: #1a1a1a;
             text-align: center;
-            border-bottom: 2px solid #f8f8f9;
-            padding-bottom: 10px;
+            font-weight: 800;
         }
         
-        h2 { font-size: 18px; margin-top: 0; }
+        h2 { font-size: 18px; margin: 0 0 10px 0; color: #333; }
         p { font-size: 15px; line-height: 1.6; color: var(--text-sub); margin-bottom: 15px; }
 
-        /* 大按钮，适合手指点击 */
         .btn {
-            background: var(--primary);
+            background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
             color: white;
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            /* 点击反馈 */
-            active: scale(0.98); 
-            transition: opacity 0.2s;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(71, 118, 230, 0.3);
+            transition: transform 0.1s;
         }
-        .btn:active { opacity: 0.8; }
+        .btn:active { transform: scale(0.98); }
 
         .btn-skip {
-            background: transparent;
+            background: #fff0f0;
             color: var(--danger);
-            border: 1px dashed var(--danger);
+            border: 1px solid rgba(255, 81, 47, 0.2);
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             margin-top: 15px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        /* 卡片式列表 */
         .profile-card {
-            background: #f8f8f9;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 6px;
+            background: #f8faff;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
             border-left: 4px solid var(--primary);
         }
-        .profile-name { font-weight: bold; font-size: 15px; display: block; margin-bottom: 4px; }
-        .profile-desc { font-size: 13px; color: #808695; }
+        .profile-name { font-weight: bold; font-size: 16px; color: #333; display: block; margin-bottom: 6px; }
+        .profile-desc { font-size: 14px; color: #666; }
 
-        /* 进度条区域 */
-        .loader-box { margin: 30px 0; }
-        .loader-track {
-            width: 100%;
-            height: 10px;
-            background: #e8eaec;
-            border-radius: 5px;
-            overflow: hidden;
-        }
+        /* 进度条 */
+        .loader-box { margin: 30px 0; background: #eee; border-radius: 6px; height: 12px; overflow: hidden;}
         .loader-fill {
             width: 0%;
             height: 100%;
-            background: var(--primary);
-            border-radius: 5px;
+            background: linear-gradient(90deg, #4776E6, #8E54E9);
+            border-radius: 6px;
         }
 
-        /* 动画配置 (逻辑不变) */
+        /* 动画逻辑 (保持不变) */
         .mode-linear .loader-fill { transition: width 8000ms linear; }
         .mode-fast-start .loader-fill { transition: width 8000ms cubic-bezier(0.1, 0.9, 0.2, 1.0); }
         .mode-peak-end .loader-fill { transition: width 8000ms cubic-bezier(0.8, 0, 0.9, 1); }
 
-        /* 验证码区域 */
+        /* 验证码 */
         #math-challenge {
             background: #fff;
             padding: 20px;
-            border: 1px solid #dcdee2;
-            border-radius: 8px;
+            border: 1px solid #eee;
+            border-radius: 12px;
             text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         input[type="number"] {
-            padding: 10px;
-            width: 80px;
+            padding: 12px;
+            width: 100px;
             font-size: 18px;
             text-align: center;
-            border: 1px solid #dcdee2;
-            border-radius: 4px;
-            margin: 0 5px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            outline: none;
+        }
+        input[type="number"]:focus { border-color: #4776E6; }
+
+        /* 线索卡片 */
+        .clue-card {
+            background: #fff;
+            border: 1px solid #eef2f7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
 
-        /* 单选框优化 */
+        /* 选项 */
         label {
             display: flex;
             align-items: center;
-            padding: 12px;
-            background: #f8f8f9;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            /* 增大点击热区 */
-            cursor: pointer; 
-        }
-        input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
-
-        /* 结果与导出 */
-        .result-box {
-            background: #e8f4fd;
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #bdf;
-            margin: 15px 0;
+            background: #f8faff;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        label:active { background: #eef4ff; border-color: var(--primary); }
+        input[type="radio"] { margin-right: 12px; width: 20px; height: 20px; accent-color: var(--primary); }
+
+        /* 结果 */
+        .result-box {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #dce9f5;
+            margin: 20px 0;
         }
         .stamp {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 900;
             display: inline-block;
-            padding: 4px 10px;
-            border: 2px solid;
-            border-radius: 4px;
-            margin-bottom: 10px;
+            padding: 5px 15px;
+            border: 3px solid;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transform: rotate(-5deg);
         }
-        .stamp-success { color: #19be6b; border-color: #19be6b; }
-        .stamp-fail { color: #ed4014; border-color: #ed4014; }
+        .stamp-success { color: #00b894; border-color: #00b894; }
+        .stamp-fail { color: #FF512F; border-color: #FF512F; }
 
         textarea {
             width: 100%;
-            height: 150px;
-            padding: 10px;
-            border: 1px solid #dcdee2;
-            border-radius: 6px;
-            font-size: 12px;
-            background: #f8f8f9;
-            box-sizing: border-box; /* 防止撑破容器 */
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #f9f9f9;
+            box-sizing: border-box;
+            resize: none;
         }
     </style>
 </head>
@@ -179,73 +183,74 @@
 <div class="container" id="game-container">
     
     <div id="stage-intro" class="main-stage">
-        <h1>案件：公司删库事件</h1>
-        <p>昨晚，公司核心数据库被恶意清空，备份也被覆盖。CTO 让你立刻调查三名有权限的嫌疑人。</p>
+        <h1>事件：幽灵代码</h1>
+        <p>公司即将上线的新产品代码被恶意清空。CTO 要求你从技术日志中找出内鬼。所有人都声称自己是无辜的。</p>
         
         <div class="profile-card">
-            <span class="profile-name">嫌疑人 A：新来实习生</span>
-            <span class="profile-desc">动机：操作不熟练，案发前被看到在手忙脚乱地修Bug。</span>
+            <span class="profile-name">A. 技术总监 (老张)</span>
+            <span class="profile-desc">情况：拥有唯一的Root权限。因期权问题刚和CEO吵了一架，扬言要离职。</span>
         </div>
         <div class="profile-card">
-            <span class="profile-name">嫌疑人 B：被裁程序员</span>
-            <span class="profile-desc">动机：昨天刚收到裁员通知，扬言要“给公司留点纪念”。</span>
+            <span class="profile-name">B. 产品副总 (Lisa)</span>
+            <span class="profile-desc">情况：不懂技术，但极力主张购买外部系统代替自研。昨晚在公司加班。</span>
         </div>
         <div class="profile-card">
-            <span class="profile-name">嫌疑人 C：运维主管</span>
-            <span class="profile-desc">动机：外表老实，但最近急需用钱。</span>
+            <span class="profile-name">C. 运维实习生 (小陈)</span>
+            <span class="profile-desc">情况：昨晚值夜班。胆小怕事，没有高级权限，但物理接触过服务器。</span>
         </div>
 
-        <button class="btn" onclick="nextRound()">开始恢复日志</button>
+        <button class="btn" onclick="nextRound()">开始审计日志</button>
     </div>
 
     <div id="stage-loading" class="main-stage hidden" onclick="handleFidget(event)">
-        <h2 id="loading-title" style="text-align:center;">正在恢复数据...</h2>
+        <h2 id="loading-title" style="text-align:center; color:#4776E6;">正在连接审计服务器...</h2>
         <div class="loader-box">
             <div class="loader-track"><div class="loader-fill" id="progBar"></div></div>
         </div>
         
         <div id="skip-wrapper">
-            <button class="btn-skip" onclick="clickSkip()">⚠ 系统卡顿？点击启用管理员通道</button>
+            <button class="btn-skip" onclick="clickSkip()">⚠ 连接超时？点击申请最高权限</button>
         </div>
 
         <div id="math-challenge" class="hidden">
-            <p><strong>管理员身份验证</strong></p>
-            <div style="margin: 15px 0;">
-                <span id="math-question" style="font-size: 20px; font-weight: bold; letter-spacing: 2px;"></span> = ?
+            <p><strong>身份验证</strong></p>
+            <p style="margin:10px 0; color:#666;">请输入动态口令：</p>
+            <div style="font-size: 24px; font-weight: bold; letter-spacing: 2px; margin-bottom:15px;">
+                <span id="math-question"></span> = ?
             </div>
-            <input type="number" id="math-answer" placeholder="结果">
-            <button class="btn" style="margin-top:15px;" onclick="checkMath()">确认验证</button>
+            <input type="number" id="math-answer" placeholder="输入结果">
+            <button class="btn" onclick="checkMath()">验证</button>
         </div>
     </div>
 
     <div id="stage-clue" class="main-stage hidden">
-        <h2>恢复成功</h2>
-        <p style="color:#2d8cf0; font-weight:bold;" id="clue-meta"></p>
-        <div style="background:#fff; border:1px solid #eee; padding:15px; border-radius:8px;">
-            <p id="clue-text" style="margin:0; color:#333;"></p>
+        <h2>日志解密成功</h2>
+        <p style="color:var(--primary); font-weight:bold; margin-bottom:5px;" id="clue-meta"></p>
+        <div class="clue-card">
+            <p id="clue-text" style="margin:0; color:#2c3e50; font-size:15px; font-weight:500;"></p>
         </div>
-        <button class="btn" onclick="nextRound()">继续</button>
+        <button class="btn" onclick="nextRound()">分析下一条</button>
     </div>
 
     <div id="stage-deduction" class="main-stage hidden">
-        <h1>结案报告</h1>
-        <p>根据恢复的日志，谁是真凶？</p>
-        <label><input type="radio" name="suspect" value="实习生"> 实习生 (误操作)</label>
-        <label><input type="radio" name="suspect" value="被裁员工"> 被裁程序员 (报复)</label>
-        <label><input type="radio" name="suspect" value="运维主管"> 运维主管 (倒卖数据)</label>
+        <h1>调查结论</h1>
+        <p>综合三条日志，真正的破坏者是谁？</p>
+        <label><input type="radio" name="suspect" value="技术总监"> 技术总监 (老张)</label>
+        <label><input type="radio" name="suspect" value="产品副总"> 产品副总 (Lisa)</label>
+        <label><input type="radio" name="suspect" value="实习生"> 实习生 (小陈)</label>
         <button class="btn" onclick="submitVerdict()">提交报告</button>
     </div>
 
     <div id="stage-result" class="main-stage hidden">
         <div id="result-header" style="text-align: center;"></div>
         <div class="result-box">
-            <p id="result-message" style="font-weight:bold; margin-bottom:10px;"></p>
-            <div style="font-size:13px; color:#666; border-top:1px solid #ccc; padding-top:10px;">
-                <strong>真相还原：</strong><br>
-                真凶是<b>运维主管</b>。<br><br>
-                1. 实习生虽然菜，但他没有核心权限删除备份。<br>
-                2. 被裁员工的账号在离职即刻就被冻结了，无法登录。<br>
-                3. 日志显示，操作是用<b>主管的物理密钥</b>进行的，且数据在删除前被打包上传到了海外网盘（为了卖钱）。
+            <p id="result-message" style="font-weight:bold; font-size:16px; margin-bottom:15px;"></p>
+            <div style="font-size:14px; color:#555; border-top:1px dashed #ccc; padding-top:15px; line-height:1.6;">
+                <strong>真相复盘：</strong><br>
+                真凶是 <b>产品副总 (Lisa)</b>。<br><br>
+                1. <b>账号疑点</b>：操作确实用了总监的账号（日志I），这很容易让人以为是总监干的。<br>
+                2. <b>时间差</b>：但日志II显示，总监早已离开公司且并未连接VPN。说明有人在“物理现场”用了他的电脑。<br>
+                3. <b>关键漏洞</b>：日志III显示，总监的电脑未锁屏！而那个时间点，只有Lisa在旁边的工位上（监控证据）。她利用总监未锁屏的电脑删除了代码，既消灭了自研项目，又嫁祸给了死对头。
             </div>
         </div>
         <button class="btn" onclick="goToExport()">生成实验数据</button>
@@ -253,32 +258,32 @@
 
     <div id="stage-export" class="main-stage hidden">
         <h2>实验结束</h2>
-        <p>请复制下方代码：</p>
+        <p>请长按复制下方代码，粘贴到问卷第一题：</p>
         <textarea id="final-data" readonly></textarea>
         <button class="btn" id="copy-btn" onclick="copyData()">一键复制</button>
     </div>
 </div>
 
 <script>
-    // --- 极简文案配置 ---
+    // --- 难度升级版文案 ---
     const clues = [
-        { meta: "日志片段 1/3", text: "系统显示：‘核心数据库’是被永久删除的，而不是格式化。这种操作需要最高级别的物理密钥（U盾）插入服务器才能执行。" },
-        { meta: "日志片段 2/3", text: "账号记录显示：被裁程序员的账号在昨天下午 17:00 就已经被HR冻结了，案发时他根本无法登录系统。" },
-        { meta: "日志片段 3/3", text: "流量分析：在数据被删除的前10分钟，服务器有大量数据流出，目的地是一个境外的匿名网盘。这不是报复泄愤，这是为了偷数据卖钱。" }
+        { meta: "日志片段 1/3：操作者身份", text: "系统指令记录：昨晚 23:45，执行 `rm -rf` 删库指令的账号是 Root 管理员——也就是【技术总监 (老张)】的个人账号。" },
+        { meta: "日志片段 2/3：网络与位置", text: "门禁与VPN日志：技术总监在 20:00 刷卡离开了公司，之后没有再次进入。且案发时段（23:45），并没有任何外部 IP 通过 VPN 远程登录他的账号。" },
+        { meta: "日志片段 3/3：终端环境", text: "硬件审计：指令并非通过远程发送，而是直接从技术总监办公桌上的【本地终端】敲入的。监控显示，总监走时【忘记了锁屏】。而在 23:40 分，【产品副总】曾坐在旁边的工位上等网约车。" }
     ];
     
     const loadingTexts = [
-        "正在扫描操作日志...",
-        "正在核对账号权限...",
-        "正在追踪网络流量..."
+        "正在追踪账号操作记录...",
+        "正在比对门禁与VPN日志...",
+        "正在调取现场监控画面..."
     ];
     
     // 简单的数学题
-    const mathQs = [ {q: "10 + 20", a: 30}, {q: "5 x 6", a: 30}, {q: "50 - 5", a: 45} ];
+    const mathQs = [ {q: "8 + 9", a: 17}, {q: "20 - 5", a: 15}, {q: "3 x 4", a: 12} ];
 
     let currentRound = 0;
     
-    // --- 核心逻辑 ---
+    // --- 核心逻辑 (保持不变) ---
     const urlParams = new URLSearchParams(window.location.search);
     const assignedGroup = urlParams.get('g') ? parseInt(urlParams.get('g')) : Math.floor(Math.random() * 3) + 1;
 
@@ -367,7 +372,7 @@
             setTimeout(() => { finishWaiting(true); }, 200); 
         } else {
             currentVerifErrors++;
-            alert("验证码错误");
+            alert("验证失败，请重试");
             document.getElementById('math-answer').value = "";
         }
     }
@@ -392,18 +397,20 @@
 
     function submitVerdict() {
         const sel = document.querySelector('input[name="suspect"]:checked');
-        if (!sel) return alert("请选择一个嫌疑人");
+        if (!sel) return alert("请先选择一个嫌疑人");
         experimentData.finalChoice = sel.value;
-        experimentData.isCorrect = (sel.value === "运维主管");
+        experimentData.isCorrect = (sel.value === "产品副总");
         
         const header = document.getElementById('result-header');
         const msg = document.getElementById('result-message');
         if (experimentData.isCorrect) {
-            header.innerHTML = '<div class="stamp stamp-success">判断正确</div>';
-            msg.innerText = "厉害！你成功锁定了内鬼。";
+            header.innerHTML = '<div class="stamp stamp-success">推理正确</div>';
+            msg.innerText = "精彩！你发现了“账号”和“本人”的不一致，并抓住了未锁屏这个关键漏洞。";
+            msg.style.color = "#00b894";
         } else {
-            header.innerHTML = '<div class="stamp stamp-fail">判断错误</div>';
-            msg.innerText = "很遗憾，真凶是运维主管。";
+            header.innerHTML = '<div class="stamp stamp-fail">推理错误</div>';
+            msg.innerText = "很遗憾。你可能被“账号记录”误导了，忽略了总监并未在现场且没有远程连接的事实。";
+            msg.style.color = "#FF512F";
         }
         switchStage('stage-result');
     }
@@ -416,12 +423,14 @@
     function switchStage(id) {
         document.querySelectorAll('.main-stage').forEach(el => el.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
+        window.scrollTo(0, 0); // 切换时回到顶部
     }
 
     function copyData() {
         const txt = document.getElementById('final-data');
         txt.select(); document.execCommand('copy');
         document.getElementById('copy-btn').innerText = "✅ 已复制";
+        setTimeout(() => { document.getElementById('copy-btn').innerText = "一键复制"; }, 2000);
     }
 </script>
 </body>
